@@ -4,7 +4,9 @@ from pathlib import Path
 
 
 def main():
+    from config import VERSION
     parser=argparse.ArgumentParser(description="Snake 3D — маленькое путешествие")
+    parser.add_argument("--version",action="version",version=f"Snake 3D {VERSION}")
     parser.add_argument("--offscreen",action="store_true",help="Рендер без видимого окна")
     parser.add_argument("--save-path",type=Path,help="Отдельный профиль для проверки")
     parser.add_argument("--smoke-frames",type=int,default=0,help="Закрыть после N кадров (для проверки сборки)")

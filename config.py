@@ -12,6 +12,7 @@ CAMERA_LOOK_AHEAD = 1.2
 CAMERA_SMOOTHING = 7.0
 WINDOW_SIZE = (1280, 800)
 TITLE = "Snake 3D · Маленькое путешествие"
+VERSION = "1.0"
 
 BODY_COLORS = {
     "green": ("Зелёный", (0.39, 0.70, 0.39, 1)),

@@ -27,7 +27,8 @@ PyInstaller читает `Snake3D.spec`, собирает Python, расшире
 ```text
 dist/Snake3D/
   Snake3D.exe
-  README.md
+  README.txt
+  README_SOURCE.md
   LICENSE
   THIRD_PARTY.md
   _internal/
@@ -65,3 +66,9 @@ GUI-приложение может запускаться из PowerShell ас�
 Исходники и сборка проверены в текущем Windows x64 окружении. Проверка на
 другом компьютере без Python остаётся частью ручной приёмки. EXE не подписан.
 `build/`, `dist/` и `artifacts/` не отправляются в Git.
+
+## ZIP и публикация
+
+Полный цикл: `.\build_release.ps1`. Он создаёт `dist/Snake-3D-v1.0-Windows.zip`,
+контрольную сумму, отдельный архив материалов itch.io и проверяет распакованный EXE.
+Подробности: [DISTRIBUTION.md](DISTRIBUTION.md).

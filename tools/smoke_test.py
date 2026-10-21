@@ -18,6 +18,7 @@ from game.snake import Direction
 from game.resources import screenshot
 from game.save_manager import SaveManager
 from tools.autoplay import choose_direction
+from config import ASSETS
 
 
 def run(windowed=False):
@@ -200,7 +201,10 @@ def run(windowed=False):
             assert app.state=="menu"
             count=sum(name!="fps-30-equals-144" for name in checks)
             report={"checks":checks,"screenshots":count,"passed":True,"levels_completed":3,
-                    "real_apple_events":30,"profile":"temporary","windowed":windowed}
+                    "real_apple_events":30,"profile":"temporary","windowed":windowed,
+                    "frozen":bool(getattr(sys,"frozen",False)),"resource_root":str(ASSETS),
+                    "font_valid":bool(app.font.isValid()),
+                    "sound_lengths_seconds":{name:round(sound.length(),3) for name,sound in app.audio.sounds.items()}}
             (output/"smoke-report.json").write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding="utf-8")
             print(f"PASS: {len(checks)} checks, {count} screenshots; all levels, rewards, saves, menus, camera and scene cleanup")
         finally:

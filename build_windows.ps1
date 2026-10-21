@@ -6,7 +6,8 @@ if (-not (Test-Path -LiteralPath $pythonExe)) {
     throw 'First create .venv and install requirements-dev.txt. See README.md.'
 }
 if (-not $SkipTests) {
-    & $pythonExe -m pytest -q
+    $testFolder = Join-Path $PSScriptRoot ('artifacts\pytest-build-' + [guid]::NewGuid().ToString('N'))
+    & $pythonExe -m pytest -q --basetemp $testFolder
     if ($LASTEXITCODE -ne 0) { throw 'Tests failed.' }
 }
 & $pythonExe -m PyInstaller --noconfirm Snake3D.spec

@@ -16,7 +16,7 @@ a = Analysis(
 pyz = PYZ(a.pure)
 exe = EXE(pyz, a.scripts, [], exclude_binaries=True, name="Snake3D",
           debug=False, bootloader_ignore_signals=False, strip=False,
-          upx=False, console=False)
+          upx=False, console=False, version="publishing/windows/version_info.txt")
 coll = COLLECT(exe, a.binaries, a.datas, strip=False, upx=False, name="Snake3D")
 
 # Читаемые инструкции и лицензии в корне готовой папки.
@@ -24,8 +24,10 @@ from pathlib import Path
 from importlib.metadata import distribution
 import shutil
 output = Path(DISTPATH) / "Snake3D"
-for name in ("README.md", "LICENSE", "THIRD_PARTY.md"):
+for name in ("LICENSE", "THIRD_PARTY.md"):
     shutil.copy2(name, output / name)
+shutil.copy2("README.md", output / "README_SOURCE.md")
+shutil.copy2("publishing/windows/README_PLAYER_RU.txt", output / "README.txt")
 shutil.copytree("docs", output / "docs", dirs_exist_ok=True)
 shutil.copy2("assets/fonts/OFL.txt", output / "NotoSans-OFL.txt")
 panda_license = distribution("panda3d").locate_file("panda3d-1.10.16.dist-info/LICENSE.txt")

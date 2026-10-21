@@ -4,6 +4,11 @@
 Камера следует за персонажем, а неподвижная мини-карта показывает всю арену.
 Модели, скруглённый интерфейс и короткие звуки создаются программно. Blender не нужен.
 
+**Готовая версия Windows без установки Python:** скачайте
+[Snake-3D-v1.0-Windows.zip](https://github.com/ArishkaWolf/Snake-3D/releases/download/v1.0/Snake-3D-v1.0-Windows.zip),
+полностью распакуйте и запустите `Snake3D.exe`. Сохраните `_internal` рядом с EXE.
+Архив и материалы itch.io описаны в [инструкции распространения](docs/DISTRIBUTION.md).
+
 ![Главное меню](docs/screenshots/main.png)
 
 ## Установка и запуск в Windows
