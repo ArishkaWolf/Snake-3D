@@ -69,6 +69,7 @@ def test_wall_collision(head,direction):
     game.body=[head]
     game.direction=direction
     assert game.step()=="lost"
+    assert game.collision=="wall"
     assert game.body==[head]
     assert game.step()=="idle"
     assert not game.turn(1)
@@ -80,6 +81,7 @@ def test_body_collision():
     game.direction=Direction.EAST
     game.food=(0,0)
     assert game.step()=="lost"
+    assert game.collision=="body"
 
 
 def test_can_move_into_departing_tail():
@@ -95,6 +97,7 @@ def test_can_move_into_departing_tail():
 def test_obstacle_collision():
     game=SnakeGame(obstacles={(10,10)})
     assert game.step()=="lost"
+    assert game.collision=="obstacle"
     assert "камень" in game.reason
 
 

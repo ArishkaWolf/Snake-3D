@@ -1,11 +1,11 @@
-# Распространение Snake 3D v1.0
+# Распространение Snake 3D v1.1
 
 ## Архив игрока
 
-`dist/Snake-3D-v1.0-Windows.zip` содержит одну папку:
+`dist/Snake-3D-v1.1-Windows.zip` содержит одну папку:
 
 ```text
-Snake-3D-v1.0-Windows/
+Snake-3D-v1.1-Windows/
   Snake3D.exe
   README.txt                 инструкция игрока: распаковать и запустить
   _internal/                 Python, Panda3D, DLL, шрифты и WAV
@@ -45,19 +45,20 @@ Snake-3D-v1.0-Windows/
 ```powershell
 .\.venv\Scripts\python.exe tools\create_press_kit.py
 .\.venv\Scripts\python.exe tools\package_release.py
-.\.venv\Scripts\python.exe tools\verify_release.py dist\Snake-3D-v1.0-Windows.zip
+.\.venv\Scripts\python.exe tools\verify_release.py dist\Snake-3D-v1.1-Windows.zip
 ```
 
-Контрольная сумма всего архива находится в `Snake-3D-v1.0-Windows.zip.sha256`.
-Результат запуска — `Snake-3D-v1.0-Windows.verification.json`.
-Проверить SHA256 можно командой `Get-FileHash .\Snake-3D-v1.0-Windows.zip -Algorithm SHA256`.
+Контрольная сумма всего архива находится в `Snake-3D-v1.1-Windows.zip.sha256`.
+Результат запуска — `Snake-3D-v1.1-Windows.verification.json`.
+Проверить SHA256 можно командой `Get-FileHash .\Snake-3D-v1.1-Windows.zip -Algorithm SHA256`.
 
 ## Что проверяет извлечённый EXE
 
 - CRC ZIP и соответствие каждого файла MANIFEST.sha256.
 - Запуск из отдельного каталога с пробелами и кириллицей, без исходников и Python в PATH.
 - Создание сохранения по обычному пути LOCALAPPDATA, загрузку образа и настроек после перезапуска.
-- Настоящее графическое окно, шрифт с кириллицей и пять загруженных звуков ненулевой длительности.
+- Настоящее графическое окно, шрифт с кириллицей, семь эффектов и зацикленную музыку длиной 48 секунд.
+- Независимые громкости музыки и эффектов, их сохранение, отдельные звуки стены и тела.
 - Полный встроенный самотест трёх миров, меню, камеры, карты, наград и удаления сцен.
 - Наличие встроенного интерпретатора и расположение ресурсов внутри извлечённого приложения.
 
@@ -68,7 +69,7 @@ Windows Sandbox/отдельная VM в текущем окружении не 
 ## GitHub Releases
 
 Репозиторий: https://github.com/ArishkaWolf/Snake-3D
-Релиз v1.0: https://github.com/ArishkaWolf/Snake-3D/releases/tag/v1.0
+Релиз v1.1: https://github.com/ArishkaWolf/Snake-3D/releases/tag/v1.1
 
 ZIP не хранится в Git-истории. Для публикации используется официальный REST API.
 Авторизация берётся из GH_TOKEN / GITHUB_TOKEN либо настроенного Git Credential Manager;
@@ -86,7 +87,7 @@ ZIP не хранится в Git-истории. Для публикации и�
 
 ## itch.io
 
-Набор: `publishing/itchio/` и `dist/Snake-3D-v1.0-itchio-kit.zip`.
+Набор: `publishing/itchio/` и `dist/Snake-3D-v1.1-itchio-kit.zip`.
 Название, описание, параметры страницы, инструкция, обложки 1260×1000/630×500
 и пять PNG 1280×800 готовы. Порядок публикации — `publishing/itchio/PUBLISH_GUIDE.md`.
 Войти в личный аккаунт и опубликовать страницу может владелец. Публикация на itch.io

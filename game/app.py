@@ -12,7 +12,7 @@ from game.customization import SnakeVisual
 from game.camera import FollowCamera
 from game.food import FoodVisual, PickupEffects
 from game.minimap import Minimap
-from game.audio import Audio
+from game.audio import Audio, collision_sound
 from game.ui import UI
 from game.resources import mount_assets
 
@@ -33,7 +33,7 @@ class SnakeApp(ShowBase):
         self.resource_mount=mount_assets()
         self.font=self.loader.loadFont("/snake-assets/fonts/NotoSans-Regular.ttf")
         self.font.setPixelsPerUnit(64)
-        self.audio=Audio(self,self.save.data["settings"]["volume"])
+        self.audio=Audio(self,self.save.data["settings"]["volume"],self.save.data["settings"]["music_volume"])
         self.ui=UI(self,self.font)
         self.state="menu"
         self.world=None
@@ -217,6 +217,7 @@ class SnakeApp(ShowBase):
     def reset_progress(self,back):
         if self.save.reset():
             self.audio.set_volume(self.save.data["settings"]["volume"])
+            self.audio.set_music_volume(self.save.data["settings"]["music_volume"])
             self.show_main()
             self.toast("Новая история начинается здесь")
         else:
@@ -258,7 +259,7 @@ class SnakeApp(ShowBase):
             won=event=="won"
             new+=self.save.finish(self.level.id,self.game.score,won)
             self.state=event
-            self.audio.play("win" if won else "lose")
+            self.audio.play("win" if won else collision_sound(self.game.collision))
             self.ui.result(won)
         if new:
             self.audio.play("unlock")
@@ -270,6 +271,7 @@ class SnakeApp(ShowBase):
     def update(self,task):
         dt=ClockObject.getGlobalClock().getDt()
         self.time+=dt
+        self.audio.update(dt,paused=self.state in ("paused","settings","confirm_reset"))
         if self.notice:
             self.notice_time-=dt
             if self.notice_time<=0:

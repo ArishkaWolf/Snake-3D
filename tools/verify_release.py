@@ -13,6 +13,10 @@ import tempfile
 import wave
 import zipfile
 
+ROOT=Path(__file__).resolve().parents[1]
+sys.path.insert(0,str(ROOT))
+from game.audio import EFFECT_NAMES
+
 
 def sha256(path):
     digest=hashlib.sha256()
@@ -46,9 +50,11 @@ def verify(path):
             raise RuntimeError(f"Manifest mismatch: {name}")
     info=json.loads((app_dir/"BUILD_INFO.json").read_text(encoding="utf-8"))
     sound_files=app_dir/"_internal"/"assets"/"sounds"
-    for name in ("eat","click","win","lose","unlock"):
+    for name in EFFECT_NAMES:
         with wave.open(str(sound_files/f"{name}.wav"),"rb") as sound:
             assert sound.getnframes()>0 and sound.getnchannels()==1
+    with wave.open(str(app_dir/"_internal/assets/music/little_journey.wav"),"rb") as music:
+        assert music.getnchannels()==2 and music.getnframes()/music.getframerate()==48
     runtime=app_dir/"_internal"
     assert list(runtime.glob("python3*.dll"))
     assert (runtime/"assets"/"fonts"/"NotoSans-Regular.ttf").stat().st_size>100000
@@ -76,15 +82,19 @@ def verify(path):
     data.update(total_apples=5,completed_levels=["garden"],records={"garden":5})
     data["selected"]["color"]="pink"
     data["settings"]["volume"]=0.35
+    data["settings"]["music_volume"]=0.17
     save.write_text(json.dumps(data,ensure_ascii=False),encoding="utf-8")
     launch("--smoke-frames","12","--screenshot","artifacts/restored-profile.png")
     restored=json.loads(save.read_text(encoding="utf-8"))
     assert restored["total_apples"]==5 and restored["selected"]["color"]=="pink"
     assert restored["settings"]["volume"]==0.35 and "sand" in restored["unlocked_levels"]
+    assert restored["settings"]["music_volume"]==0.17
     launch("--self-test")
     smoke=json.loads((app_dir/"artifacts"/"smoke-report.json").read_text(encoding="utf-8"))
     assert smoke["passed"] and smoke["frozen"] and smoke["font_valid"] and smoke["windowed"]
     assert all(length>0 for length in smoke["sound_lengths_seconds"].values())
+    assert smoke["music_length_seconds"]==48 and smoke["music_loop"]
+    assert smoke["collision_sounds_tested"]==["hit_wall","hit_tail"]
     assert Path(smoke["resource_root"]).resolve().is_relative_to(app_dir.resolve())
     report={"passed":True,"archive":path.name,"archive_sha256":sha256(path),
             "archive_bytes":path.stat().st_size,"version":info["version"],"source_commit":info["source_commit"],
@@ -93,7 +103,7 @@ def verify(path):
             "extracted_to":str(app_dir),"default_save_and_reload":"passed", "windowed_smoke":smoke}
     destination=path.with_suffix(".verification.json")
     destination.write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding="utf-8")
-    print(f"PASS: extracted ZIP, isolated PATH, Cyrillic path, fonts, 5 sounds, saves, {len(smoke['checks'])} checks")
+    print(f"PASS: extracted ZIP, isolated PATH, fonts, {len(EFFECT_NAMES)} effects, looping music, saves, {len(smoke['checks'])} checks")
     print(destination)
     return report
 

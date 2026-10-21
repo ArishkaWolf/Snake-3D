@@ -34,6 +34,7 @@ class SnakeGame:
         self.score = 0
         self.status = "playing"
         self.reason = ""
+        self.collision = None
         self.food = self.spawn_food()
 
     def spawn_food(self):
@@ -73,9 +74,11 @@ class SnakeGame:
         # Хвост освобождает клетку одновременно с движением головы.
         occupied = self.body if grows else self.body[:-1]
         if not (0 <= head[0] < self.size and 0 <= head[1] < self.size):
+            self.collision = "wall"
             self.status, self.reason = "lost", "Вы встретились с краем сада"
             return "lost"
         if head in self.obstacles or head in occupied:
+            self.collision = "obstacle" if head in self.obstacles else "body"
             self.status = "lost"
             self.reason = "На пути оказался камень" if head in self.obstacles else "Хвост оказался слишком близко"
             return "lost"

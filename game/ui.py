@@ -178,25 +178,33 @@ class UI:
 
     def settings(self,back):
         self.clear()
-        self.panel(0,0,1.95,1.70)
+        self.panel(0,0,2.10,1.90)
         self.title("СДЕЛАЙТЕ СЕБЕ УДОБНО","Настройки")
-        self.text("Громкость звуков",0,0.37,0.041)
+        self.text("Звуковые эффекты",0,0.39,0.041)
         slider=DirectSlider(parent=self.root,range=(0,1),value=self.app.save.data["settings"]["volume"],
-                            pageSize=0.05,scale=0.61,pos=(0,-0.03,0.23),frameColor=(0.77,0.83,0.71,1),
+                            pageSize=0.05,scale=0.61,pos=(0,-0.03,0.27),frameColor=(0.77,0.83,0.71,1),
                             thumb_frameColor=GREEN)
         self.widgets.append(slider)
         def volume():
             self.app.save.data["settings"]["volume"]=float(slider["value"])
             self.app.audio.set_volume(slider["value"])
         slider["command"]=volume
-        self.text("Расстояние до камеры",0,0.04,0.041)
+        self.text("Фоновая музыка",0,0.09,0.041)
+        music=DirectSlider(parent=self.root,range=(0,1),value=self.app.save.data["settings"]["music_volume"],
+                           pageSize=0.05,scale=0.61,pos=(0,-0.03,-0.03),frameColor=(0.77,0.83,0.71,1),thumb_frameColor=GREEN)
+        self.widgets.append(music)
+        def music_volume():
+            self.app.save.data["settings"]["music_volume"]=float(music["value"])
+            self.app.audio.set_music_volume(music["value"])
+        music["command"]=music_volume
+        self.text("Расстояние до камеры",0,-0.21,0.041)
         camera=DirectSlider(parent=self.root,range=(4.5,8),value=self.app.save.data["settings"]["camera_distance"],
-                            pageSize=0.25,scale=0.61,pos=(0,-0.03,-0.10),frameColor=(0.77,0.83,0.71,1),thumb_frameColor=GREEN)
+                            pageSize=0.25,scale=0.61,pos=(0,-0.03,-0.33),frameColor=(0.77,0.83,0.71,1),thumb_frameColor=GREEN)
         self.widgets.append(camera)
         camera["command"]=lambda:self.app.save.data["settings"].update(camera_distance=float(camera["value"]))
-        self.text("A / влево — левый поворот     D / вправо — правый\nEsc — пауза     R — повтор после проигрыша",0,-0.32,0.028,MUTED)
-        self.button("Сбросить прогресс",0,-0.54,lambda:self.app.confirm_reset(back),width=1.30,size=0.035)
-        self.button("Готово",0,-0.73,lambda:self.app.close_settings(back),width=1.30,primary=True)
+        self.text("A / влево — левый поворот     D / вправо — правый\nEsc — пауза     R — повтор после проигрыша",0,-0.48,0.026,MUTED)
+        self.button("Сбросить прогресс",0,-0.64,lambda:self.app.confirm_reset(back),width=1.30,size=0.035)
+        self.button("Готово",0,-0.82,lambda:self.app.close_settings(back),width=1.30,primary=True)
 
     def confirm_reset(self,back):
         self.clear()

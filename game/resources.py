@@ -8,7 +8,7 @@ def mount_assets():
     vfs=VirtualFileSystem.getGlobalPtr()
     mount=VirtualFileMountRamdisk()
     vfs.mount(mount,"/snake-assets",0)
-    for folder in ("fonts","sounds"):
+    for folder in ("fonts","sounds","music"):
         vfs.makeDirectoryFull(f"/snake-assets/{folder}")
         for path in (ASSETS/folder).iterdir():
             if path.suffix.lower() in (".ttf",".wav"):

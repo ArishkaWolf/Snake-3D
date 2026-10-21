@@ -15,7 +15,7 @@ def default_data():
             "records": {}, "total_apples": 0, "max_length": 4, "quests": [],
             "unlocked": {"colors": ["green"], "eyes": ["black"], "accessories": []},
             "selected": {"color": "green", "eyes": "black", "accessories": []},
-            "settings": {"volume": 0.6, "camera_distance": 6.2}}
+            "settings": {"volume": 0.6, "music_volume": 0.25, "camera_distance": 6.2}}
 
 
 def integer(value, fallback=0):
@@ -48,7 +48,7 @@ def sanitize(raw):
         data["selected"]["accessories"] = strings(selected.get("accessories"), data["unlocked"]["accessories"])
     settings = raw.get("settings", {})
     if isinstance(settings, dict):
-        for key, low, high in (("volume", 0, 1), ("camera_distance", 4.5, 8)):
+        for key, low, high in (("volume", 0, 1), ("music_volume", 0, 1), ("camera_distance", 4.5, 8)):
             value = settings.get(key)
             if type(value) in (int, float) and low <= value <= high:
                 data["settings"][key] = float(value)

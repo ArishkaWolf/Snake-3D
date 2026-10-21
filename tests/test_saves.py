@@ -110,3 +110,23 @@ def test_restore_missing_reward_lists_from_statistics():
     data=sanitize({"total_apples":20,"max_length":15,"completed_levels":["garden","sand","lavender"]})
     assert len(data["quests"])==5
     assert award_quests(data)==[]
+
+
+def test_old_save_keeps_effects_volume_and_gets_default_music():
+    data=sanitize({"total_apples":14,"completed_levels":["garden"],"settings":{"volume":0.4}})
+    assert data["total_apples"]==14 and "garden" in data["completed_levels"]
+    assert data["settings"]["volume"]==0.4
+    assert data["settings"]["music_volume"]==0.25
+
+
+@pytest.mark.parametrize("value",[0,0.38,1])
+def test_music_setting_survives_reload(tmp_path,value):
+    save=SaveManager(tmp_path/"save.json")
+    save.data["settings"]["music_volume"]=value
+    assert save.save()
+    assert SaveManager(save.path).data["settings"]["music_volume"]==value
+
+
+@pytest.mark.parametrize("invalid",[-1,2,math.nan,math.inf,"loud",True])
+def test_bad_music_volume_falls_back_to_default(invalid):
+    assert sanitize({"settings":{"music_volume":invalid}})["settings"]["music_volume"]==0.25

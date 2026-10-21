@@ -16,6 +16,8 @@ from urllib.parse import quote, urlencode, urlparse
 from urllib.request import Request, urlopen
 
 ROOT=Path(__file__).resolve().parents[1]
+sys.path.insert(0,str(ROOT))
+from config import VERSION
 
 
 def digest(path):
@@ -83,8 +85,8 @@ def run(args):
         return
     if not args.commit:
         raise RuntimeError("--commit is required for publication")
-    game=ROOT/"dist"/"Snake-3D-v1.0-Windows.zip"
-    kit=ROOT/"dist"/"Snake-3D-v1.0-itchio-kit.zip"
+    game=ROOT/"dist"/f"Snake-3D-v{VERSION}-Windows.zip"
+    kit=ROOT/"dist"/f"Snake-3D-v{VERSION}-itchio-kit.zip"
     verification=game.with_suffix(".verification.json")
     report=json.loads(verification.read_text(encoding="utf-8"))
     if not report["passed"] or report["archive_sha256"]!=digest(game):
@@ -94,7 +96,7 @@ def run(args):
     body=(ROOT/"publishing"/"windows"/"RELEASE_NOTES.md").read_text(encoding="utf-8")
     if release is None:
         release=api.request(f"{base}/releases",method="POST",payload={"tag_name":args.tag,"target_commitish":args.commit,
-                            "name":"Snake 3D v1.0 — Windows","body":body,"draft":True,"prerelease":False})
+                            "name":f"Snake 3D v{VERSION} — Windows","body":body,"draft":True,"prerelease":False})
     elif release["target_commitish"] not in (args.commit,"main"):
         raise RuntimeError("Existing release points to a different commit; leaving it unchanged")
     files=[game,game.with_suffix(".zip.sha256"),kit]
@@ -133,7 +135,7 @@ def run(args):
 if __name__=="__main__":
     parser=argparse.ArgumentParser()
     parser.add_argument("--repo",default="ArishkaWolf/Snake-3D")
-    parser.add_argument("--tag",default="v1.0")
+    parser.add_argument("--tag",default=f"v{VERSION}")
     parser.add_argument("--commit")
     mode=parser.add_mutually_exclusive_group(required=True)
     mode.add_argument("--check",action="store_true")

@@ -30,12 +30,20 @@ def run(windowed=False):
         clock.setMode(ClockObject.MNonRealTime)
         clock.setDt(1/60)
         checks=[]
+        images=[]
         def frame(name):
             for _ in range(3):
                 app.taskMgr.step()
             screenshot(app.win,output/f"{name}.png")
             checks.append(name)
+            images.append(name)
         try:
+            played=[]
+            original_play=app.audio.play
+            def observed_play(name):
+                played.append(name)
+                original_play(name)
+            app.audio.play=observed_play
             frame("01-main")
             app.show_levels()
             frame("02-levels-locked")
@@ -48,15 +56,28 @@ def run(windowed=False):
             frame("05-settings")
             from direct.gui.DirectGui import DirectSlider
             sliders=[widget for widget in app.ui.widgets if isinstance(widget,DirectSlider)]
+            assert len(sliders)==3
             sliders[0]["value"]=0.25
-            sliders[1]["value"]=6.2
+            sliders[1]["value"]=0.2
+            sliders[2]["value"]=6.2
             sliders[0].commandFunc()
             sliders[1].commandFunc()
+            sliders[2].commandFunc()
             assert app.save.data["settings"]["volume"]==0.25
+            assert abs(app.save.data["settings"]["music_volume"]-0.2)<0.001
+            music_before=app.audio.music.getVolume()
+            app.audio.set_volume(0)
+            assert abs(app.audio.music.getVolume()-music_before)<0.001
+            app.audio.set_volume(0.25)
+            app.audio.set_music_volume(0)
+            if windowed:
+                assert all(abs(sound.getVolume()-0.25)<0.001 for sound in app.audio.sounds.values())
+            app.audio.set_music_volume(0.2)
             app.confirm_reset("menu")
             frame("06-reset-confirmation")
             app.show_settings("menu")
             app.close_settings("menu")
+            assert abs(SaveManager(app.save.path).data["settings"]["music_volume"]-0.2)<0.001
 
             app.start_game(LEVELS[0])
             app.messenger.send("a")
@@ -117,6 +138,7 @@ def run(windowed=False):
                 frame(f"09-{level.id}-won")
                 assert len(app.effects.particles)<=level.goal*10
             assert app.save.data["total_apples"]==30
+            assert played.count("eat")==30
             assert len(app.save.data["quests"])==5
             app.show_main()
             app.show_customization()
@@ -146,6 +168,22 @@ def run(windowed=False):
                     break
             assert app.state=="lost"
             frame("14-lost")
+            assert app.game.collision=="wall"
+            # Проверяем фактические звуковые вызовы на стене и теле.
+            for cause,points,direction,expected in (
+                ("wall",[(10,19),(10,18),(10,17),(10,16)],Direction.NORTH,"hit_wall"),
+                ("body",[(3,3),(3,2),(4,2),(4,3),(4,4)],Direction.EAST,"hit_tail")):
+                app.restart_game()
+                app.game.body=list(points)
+                app.game.previous=list(points)
+                app.game.direction=direction
+                app.game.food=(0,0)
+                assert app.process_step()=="lost"
+                assert app.game.collision==cause and played[-1]==expected
+                count_before=len(played)
+                assert app.process_step()=="idle" and len(played)==count_before
+            app.audio.play=original_play
+            checks.append("distinct-impact-audio")
             app.retry_key()
             assert app.state=="playing" and app.game.score==0
             frame("15-camera-minimap")
@@ -199,11 +237,13 @@ def run(windowed=False):
             app.reset_progress("menu")
             assert app.save.data["total_apples"]==0
             assert app.state=="menu"
-            count=sum(name!="fps-30-equals-144" for name in checks)
+            count=len(images)
             report={"checks":checks,"screenshots":count,"passed":True,"levels_completed":3,
                     "real_apple_events":30,"profile":"temporary","windowed":windowed,
                     "frozen":bool(getattr(sys,"frozen",False)),"resource_root":str(ASSETS),
                     "font_valid":bool(app.font.isValid()),
+                    "music_length_seconds":round(app.audio.music.length(),3),"music_loop":bool(app.audio.music.getLoop()),
+                    "collision_sounds_tested":["hit_wall","hit_tail"],
                     "sound_lengths_seconds":{name:round(sound.length(),3) for name,sound in app.audio.sounds.items()}}
             (output/"smoke-report.json").write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding="utf-8")
             print(f"PASS: {len(checks)} checks, {count} screenshots; all levels, rewards, saves, menus, camera and scene cleanup")

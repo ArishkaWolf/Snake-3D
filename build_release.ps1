@@ -8,6 +8,7 @@ $pythonExe = Join-Path $PSScriptRoot '.venv\Scripts\python.exe'
 if ($LASTEXITCODE -ne 0) { throw 'Press kit generation failed.' }
 & $pythonExe tools/package_release.py
 if ($LASTEXITCODE -ne 0) { throw 'Release packaging failed.' }
-& $pythonExe tools/verify_release.py dist/Snake-3D-v1.0-Windows.zip
+$releaseVersion = (& $pythonExe -c 'from config import VERSION; print(VERSION)').Trim()
+& $pythonExe tools/verify_release.py "dist/Snake-3D-v$releaseVersion-Windows.zip"
 if ($LASTEXITCODE -ne 0) { throw 'Archive verification failed.' }
-Write-Output 'Ready: dist\Snake-3D-v1.0-Windows.zip and dist\Snake-3D-v1.0-itchio-kit.zip'
+Write-Output "Ready: dist\Snake-3D-v$releaseVersion-Windows.zip and dist\Snake-3D-v$releaseVersion-itchio-kit.zip"

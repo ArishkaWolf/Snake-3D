@@ -69,6 +69,6 @@ GUI-приложение может запускаться из PowerShell ас�
 
 ## ZIP и публикация
 
-Полный цикл: `.\build_release.ps1`. Он создаёт `dist/Snake-3D-v1.0-Windows.zip`,
+Полный цикл: `.\build_release.ps1`. Он создаёт `dist/Snake-3D-v1.1-Windows.zip`,
 контрольную сумму, отдельный архив материалов itch.io и проверяет распакованный EXE.
 Подробности: [DISTRIBUTION.md](DISTRIBUTION.md).

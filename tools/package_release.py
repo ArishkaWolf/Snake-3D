@@ -11,6 +11,7 @@ import zipfile
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
 from config import VERSION
+from game.audio import EFFECT_NAMES
 
 
 def sha256(path):
@@ -48,7 +49,8 @@ def package(build_dir=ROOT/"dist"/"Snake3D",output_dir=ROOT/"dist"):
     build_dir=Path(build_dir)
     required=["Snake3D.exe","README.txt","LICENSE","NotoSans-OFL.txt","Panda3D-LICENSE.txt",
               "_internal/assets/fonts/NotoSans-Regular.ttf",
-              *[f"_internal/assets/sounds/{name}.wav" for name in ("click","eat","lose","win","unlock")]]
+              "_internal/assets/music/little_journey.wav",
+              *[f"_internal/assets/sounds/{name}.wav" for name in EFFECT_NAMES]]
     # Python 3.11/3.12 тоже поддерживаются: имя DLL зависит от сборочного Python.
     if not list((build_dir/"_internal").glob("python3*.dll")):
         raise FileNotFoundError("Bundled Python runtime is missing")
