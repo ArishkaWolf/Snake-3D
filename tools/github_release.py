@@ -121,6 +121,10 @@ def run(args):
         obj=api.request(obj["url"])["object"]
     if release["draft"] or obj["sha"]!=args.commit:
         raise RuntimeError("Published release/tag verification failed")
+    # При открытии черновика GitHub заменяет временные untagged-ссылки на URL тега.
+    public_assets={asset["name"]:asset for asset in release["assets"]}
+    for asset in checked:
+        asset["url"]=public_assets[asset["name"]]["browser_download_url"]
     result={"published":True,"release_url":release["html_url"],"tag":args.tag,"commit":args.commit,"assets":checked}
     (ROOT/"artifacts"/"release-publication.json").write_text(json.dumps(result,ensure_ascii=False,indent=2),encoding="utf-8")
     print(json.dumps(result,ensure_ascii=False,indent=2))
