@@ -3,7 +3,7 @@ from direct.gui.DirectGui import DirectFrame, DirectLabel, DirectButton, DirectS
 from panda3d.core import TextNode
 from config import BODY_COLORS, EYE_COLORS, ACCESSORIES
 from game.levels import LEVELS, ENDLESS
-from game.quests import QUESTS
+from game.quests import QUESTS, quest_progress
 from game.geometry import rounded_card
 
 INK=(0.19,0.29,0.25,1)
@@ -72,6 +72,13 @@ class UI:
                             state=DGG.NORMAL if enabled else DGG.DISABLED,command=clicked)
         self.widgets.append(button)
         return button
+
+    def progress_bar(self,current,target,x,z,width=1.68,height=0.022,completed=False):
+        self.panel(x+width/2,z,width,height,(0.84,0.87,0.80,1))
+        filled=width*max(0,min(1,current/target))
+        if filled>0:
+            color=GREEN if completed else (0.56,0.72,0.48,1)
+            self.panel(x+filled/2,z,filled,height,color)
 
     def title(self,kicker,title,subtitle=""):
         self.text(kicker,0,0.81,0.029,MUTED)
@@ -154,15 +161,19 @@ class UI:
 
     def quests(self):
         self.clear()
-        self.title("МАЛЕНЬКИЕ ДОСТИЖЕНИЯ","Коллекция радостей",f"Всего яблок: {self.app.save.data['total_apples']}   ·   Максимальная длина: {self.app.save.data['max_length']}")
+        data=self.app.save.data
+        self.title("МАЛЕНЬКИЕ ДОСТИЖЕНИЯ","Коллекция радостей",f"Всего яблок: {data['total_apples']}   ·   Максимальная длина: {data['max_length']}")
         for i,q in enumerate(QUESTS):
-            z=0.32-i*0.215
-            done=q.id in self.app.save.data["quests"]
-            self.panel(0,z,2.65,0.19)
+            z=0.32-i*0.24
+            done=q.id in data["quests"]
+            current,target=quest_progress(q.id,data)
+            self.panel(0,z,2.65,0.22)
             self.text("ГОТОВО" if done else "В ПУТИ",-1.13,z+0.02,0.025,GREEN if done else MUTED)
-            self.text(q.title,-0.87,z+0.035,0.036,align=TextNode.ALeft)
-            self.text(q.description,-0.87,z-0.025,0.030,MUTED,align=TextNode.ALeft)
-            self.text(q.reward,1.20,z-0.015,0.023,MUTED,align=TextNode.ARight)
+            self.text(q.title,-0.87,z+0.045,0.036,align=TextNode.ALeft)
+            self.text(q.description,-0.87,z-0.006,0.030,MUTED,align=TextNode.ALeft)
+            self.text(q.reward,1.20,z+0.035,0.023,MUTED,align=TextNode.ARight)
+            self.progress_bar(current,target,-0.87,z-0.062,completed=done)
+            self.text(f"{current} / {target}",1.20,z-0.073,0.030,GREEN if done else INK,align=TextNode.ARight)
         self.button("Главное меню",0,-0.85,self.app.show_main,width=1.2)
 
     def settings(self,back):

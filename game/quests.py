@@ -1,5 +1,6 @@
 """Идемпотентная выдача наград за реальные сохранённые события."""
 from dataclasses import dataclass
+from game.levels import BY_ID
 
 
 @dataclass(frozen=True)
@@ -19,6 +20,21 @@ QUESTS = (
     Quest("sand", "Солнечный день", "Пройдите Песчаную долину", "Круглые очки и лавандовый цвет", "accessories", "glasses"),
     Quest("lavender", "Выше облаков", "Пройдите Лавандовый мир", "Кепка и корона", "accessories", "cap"),
 )
+
+
+def quest_progress(quest_id, data):
+    """Текущее значение и цель для UI; просмотр не выдаёт награды."""
+    if quest_id == "apples20":
+        current, target = data["total_apples"], 20
+    elif quest_id == "length15":
+        current, target = data["max_length"], 15
+    else:
+        target = BY_ID[quest_id].goal
+        # Для прохождения мира показываем лучший забег, а не сумму попыток.
+        current = target if quest_id in data["completed_levels"] else data["records"].get(quest_id, 0)
+    if quest_id in data["quests"]:
+        current = target
+    return max(0, min(current, target)), target
 
 
 def award_quests(data):
